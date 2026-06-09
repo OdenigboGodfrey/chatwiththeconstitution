@@ -6,6 +6,7 @@ import { AGENT_ID } from 'src/shared/enums/agentid.enums';
 import { RESPONSE_CODE } from 'src/shared/enums/response-code.enum';
 import { ChatWithHistoryRequestPayloadDTO } from './dtos/chat-request-payload.dto';
 import { MessageListInput } from '@mastra/core/agent/message-list';
+import { Agent, AgentEditorConfig, ToolsInput } from '@mastra/core/agent';
 
 interface MastraMessageFormat {
   role: 'user' | 'assistant' | 'system';
@@ -19,7 +20,19 @@ export class ChatService {
   async handleChat(text: string): Promise<ResponseDTO<string>> {
     const response = new ResponseDTO<string>();
     try {
-      const agent = this.mastraService.getAgent(AGENT_ID.OPENAI_RAG_AGENT);
+      let agent: Agent<
+        any,
+        ToolsInput,
+        undefined,
+        unknown,
+        AgentEditorConfig | undefined
+      >;
+      if (process.env.USE_OLLAMA == 'true') {
+        agent = this.mastraService.getAgent(AGENT_ID.OLLAMA_RAG_AGENT);
+      } else {
+        agent = this.mastraService.getAgent(AGENT_ID.OPENAI_RAG_AGENT);
+      }
+
       let agentResponse: FullOutput<undefined> | null = null;
       const MAX_RETRIES = 3;
       for (let i = 0; i < MAX_RETRIES; i++) {
@@ -65,8 +78,18 @@ export class ChatService {
   ): Promise<ResponseDTO<string>> {
     const response = new ResponseDTO<string>();
     try {
-      //   const agent = this.mastraService.getAgent(AGENT_ID.OLLAMA_RAG_AGENT);
-      const agent = this.mastraService.getAgent(AGENT_ID.OPENAI_RAG_AGENT);
+      let agent: Agent<
+        any,
+        ToolsInput,
+        undefined,
+        unknown,
+        AgentEditorConfig | undefined
+      >;
+      if (process.env.USE_OLLAMA == 'true') {
+        agent = this.mastraService.getAgent(AGENT_ID.OLLAMA_RAG_AGENT);
+      } else {
+        agent = this.mastraService.getAgent(AGENT_ID.OPENAI_RAG_AGENT);
+      }
       let agentResponse: FullOutput<undefined> | null = null;
       const MAX_RETRIES = 3;
 
@@ -114,7 +137,7 @@ export class ChatService {
       }
 
       if (agentResponse && agentResponse.text) {
-        response.data = agentResponse.text;
+        response.data = this.removeMarkdown(agentResponse.text);
         response.code = RESPONSE_CODE._200;
         response.message = 'Chat processed successfully';
       } else {
@@ -131,5 +154,15 @@ export class ChatService {
     }
 
     return response;
+  }
+
+  removeMarkdown(text: string): string {
+    // Removes hashtags at the start of lines (headers)
+    let cleanedText = text.replace(/^#+\s*/gm, '');
+
+    // Removes asterisks used for bold/italics
+    cleanedText = cleanedText.replace(/\*+/g, '');
+
+    return cleanedText;
   }
 }
