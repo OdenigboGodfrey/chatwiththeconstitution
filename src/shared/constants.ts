@@ -1,0 +1,1 @@
+export const ALL_MINI_LM_DIMENSIONS = 384;
