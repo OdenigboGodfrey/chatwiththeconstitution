@@ -383,7 +383,7 @@
                 );
                 // remove last message in chat history
                 inMemoryChatHistory.pop();
-                addMessage(responseBody.message, 'system');
+                addMessage('Something went wrong while processing your request, please try again.', 'system');
                 return;
             }
 
