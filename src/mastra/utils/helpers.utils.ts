@@ -1,30 +1,41 @@
 import { PgVector } from '@mastra/pg';
 import { MDocument } from '@mastra/rag';
-import { embedMany } from 'ai';
+import { EmbeddingModel, embedMany } from 'ai';
 import { createOllama } from 'ollama-ai-provider-v2';
 import { ResponseDTO } from 'src/shared/dtos/response.dto';
 import { RESPONSE_CODE } from 'src/shared/enums/response-code.enum';
 import { EmbeddingProcessResponseDTO } from '../dtos/embedding-process-response.dto';
-import { VECTOR_ID } from 'src/shared/enums/vectorid.enums';
-import { ALL_MINI_LM_DIMENSIONS } from 'src/shared/constants';
-
-const pgVector = new PgVector({
-  host: process.env.DATABASE_HOST!,
-  port: parseInt(process.env.DATABASE_PORT!),
-  user: process.env.DATABASE_USER!,
-  password: process.env.DATABASE_PASSWORD!,
-  database: process.env.DATABASE!,
-  id: VECTOR_ID.ID,
-});
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { pgVector } from 'src/database/pgvector';
 
 export const handleEmbedding = async (
   text: string,
+  nimInputType: 'passage' | 'query' = 'passage',
 ): Promise<ResponseDTO<EmbeddingProcessResponseDTO>> => {
   const response = new ResponseDTO<EmbeddingProcessResponseDTO>();
   try {
-    const ollama = createOllama({
-      baseURL: 'http://localhost:11434/api',
-    });
+    let model;
+    if (process.env.USE_OLLAMA === 'false') {
+      const provider = createOpenAICompatible({
+        name: 'nvidia',
+        baseURL: process.env.LLM_HOST!,
+        apiKey: process.env.LLM_API_KEY!,
+        fetch: async (input, init) => {
+          const body = JSON.parse(init!.body as string);
+          body['input_type'] = nimInputType; // let NIM know if you are processing structural knowledge chunks for bulk storage ("passage") or parsing user search prompts for vector matching ("query").
+          return fetch(input, {
+            ...init,
+            body: JSON.stringify(body),
+          });
+        },
+      });
+      model = provider.embeddingModel(process.env.EMBEDDING_MODEL!);
+    } else {
+      const provider = createOllama({
+        baseURL: process.env.LLM_HOST!,
+      });
+      model = provider.embedding(process.env.EMBEDDING_MODEL!);
+    }
 
     // clean up text content, remove unnecessary characters which takes up space
     let cleanedText = text
@@ -58,7 +69,7 @@ export const handleEmbedding = async (
     });
 
     const finalChunks: typeof initialChunks = [];
-    const MAX_CHARACTER_LIMIT = 600;
+    const MAX_CHARACTER_LIMIT = 400;
 
     for (const chunk of initialChunks) {
       if (chunk.text.length > MAX_CHARACTER_LIMIT) {
@@ -94,7 +105,7 @@ export const handleEmbedding = async (
       try {
         const { embeddings } = await embedMany({
           values: [currentChunkText],
-          model: ollama.embedding(process.env.EMBEDDING_MODEL!),
+          model: model as EmbeddingModel,
         });
 
         allEmbeddings.push(...embeddings);
@@ -126,17 +137,11 @@ export const insertEmbedding = async (
 ) => {
   const response = new ResponseDTO();
   try {
-    await pgVector.createIndex({
-      indexName: indexName,
-      dimension: ALL_MINI_LM_DIMENSIONS,
-      metric: 'cosine',
-    });
-
     // 1. Pass the raw embeddings array (number[][]) directly to vectors
     // 2. Map the metadata array so that index-for-index matches the chunks
     const upsertResponse = await pgVector.upsert({
-      indexName,
-      vectors: embeddingPayload.embeddings, // This satisfies number[][]
+      indexName: indexName,
+      vectors: embeddingPayload.embeddings,
       metadata: embeddingPayload.chunks.map((chunk) => ({
         text: chunk.text,
         document_type: documentType,
@@ -162,7 +167,7 @@ export const queryVectorEmbeddings = async (
 ) => {
   const response = new ResponseDTO<string>();
   try {
-    const embeddingResponse = await handleEmbedding(query);
+    const embeddingResponse = await handleEmbedding(query, 'query');
     if (!embeddingResponse.status) {
       response.code = embeddingResponse.code;
       response.message = embeddingResponse.message;
@@ -180,7 +185,7 @@ export const queryVectorEmbeddings = async (
     }
 
     const queryResponse = await pgVector.query({
-      indexName,
+      indexName: indexName,
       queryVector: singleGeneratedVector,
       topK: 10,
     });

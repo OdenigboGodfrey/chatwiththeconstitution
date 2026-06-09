@@ -6,21 +6,12 @@ import {
   insertEmbedding,
 } from 'src/mastra/utils/helpers.utils';
 import { INDEX_NAME } from 'src/shared/enums/index-name.enums';
-import { VECTOR_ID } from 'src/shared/enums/vectorid.enums';
 import { PDFParse } from 'pdf-parse';
-import { ALL_MINI_LM_DIMENSIONS } from 'src/shared/constants';
+import { EMBEDDING_DIMENSIONS } from 'src/shared/constants';
+import { generateIndexName } from 'src/shared/utils/generate-index-name.util';
+import { pgVector } from 'src/database/pgvector';
 
-const pgVector = new PgVector({
-  host: process.env.DATABASE_HOST!,
-  port: parseInt(process.env.DATABASE_PORT!),
-  user: process.env.DATABASE_USER!,
-  password: process.env.DATABASE_PASSWORD!,
-  database: process.env.DATABASE!,
-  id: VECTOR_ID.ID,
-});
-
-const indexName = INDEX_NAME.CHAT_WITH_THE_CONSTITUTION;
-const EMBEDDING_DIMENSION = ALL_MINI_LM_DIMENSIONS;
+const indexName = generateIndexName(INDEX_NAME.CHAT_WITH_THE_CONSTITUTION);
 
 export async function initializeKnowledgeBase() {
   console.log('Starting Knowledge Base Initialization...');
@@ -32,12 +23,12 @@ export async function initializeKnowledgeBase() {
 
     if (!indexExists) {
       console.log(
-        `Creating vector index: ${indexName} (Dimensions: ${EMBEDDING_DIMENSION})`,
+        `Creating vector index: ${indexName} (Dimensions: ${EMBEDDING_DIMENSIONS})`,
       );
 
       await pgVector.createIndex({
         indexName: indexName,
-        dimension: EMBEDDING_DIMENSION,
+        dimension: EMBEDDING_DIMENSIONS,
         metric: 'cosine',
       });
       createdIndex = true;
@@ -50,7 +41,7 @@ export async function initializeKnowledgeBase() {
     // 2. Check if it's already populated to avoid duplicate inserts
     const existingDocs = await pgVector.query({
       indexName: indexName,
-      queryVector: new Array(EMBEDDING_DIMENSION).fill(0),
+      queryVector: new Array(EMBEDDING_DIMENSIONS).fill(0),
       topK: 1,
     });
 

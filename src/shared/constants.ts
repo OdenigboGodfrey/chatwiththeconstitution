@@ -1,1 +1,2 @@
-export const ALL_MINI_LM_DIMENSIONS = 384;
+export const EMBEDDING_DIMENSIONS =
+  process.env.USE_OLLAMA === 'false' ? 1024 : 384;
