@@ -157,10 +157,18 @@ This helps handle:
 
 ## Environment Variables
 
-Create a `.env` file:
+Create a `.env` file using the example env from the project:
 
+Note: There's support for both Ollama or an OpenAI Compatible Endpoints.
+To run fully local use:
 ```env
-LLM_API_KEY=your_api_key_here
+USE_OLLAMA=true
+EMBEDDING_MODEL="all-minilm"
+```
+To run with NIM (OpenAi Compatible)
+```env
+USE_OLLAMA=false
+EMBEDDING_MODEL="nvidia/nv-embedqa-e5-v5"
 ```
 
 ---
