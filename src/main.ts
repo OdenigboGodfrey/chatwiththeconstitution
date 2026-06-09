@@ -24,7 +24,12 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
-  await initializeKnowledgeBase()
+  app.enableCors({
+    origin: '*',
+  });
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
+  console.log(`Application is running on: ${await app.getUrl()}`);
+  initializeKnowledgeBase()
     .then((result) => {
       if (!result.status) {
         console.error('error', result.message);
@@ -35,11 +40,5 @@ async function bootstrap() {
       console.error('caught error', err);
       process.exit(1);
     });
-
-  app.enableCors({
-    origin: '*',
-  });
-  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
-  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
