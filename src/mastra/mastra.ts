@@ -10,7 +10,7 @@ export const mastra = new Mastra({
   },
   backgroundTasks: {
     enabled: true,
-    defaultTimeoutMs: 600_000,
+    defaultTimeoutMs: 600_000, // set timeout to 10 minutes
     waitTimeoutMs: 120_000,
   },
 });
