@@ -106,8 +106,10 @@ export async function initializeKnowledgeBase() {
       console.log(
         `Knowledge Base initialization failed! migrated Successfully ${migratedSuccessfully} out of ${ragFileTitles.length}`,
       );
-      console.log(`Rolling back changes`);
-      await pgVector.deleteIndex({ indexName: indexName });
+      if (createdIndex) {
+        console.log(`Rolling back changes`);
+        await pgVector.deleteIndex({ indexName: indexName });
+      }
     }
 
     return { status: success };

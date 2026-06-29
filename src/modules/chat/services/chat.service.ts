@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ResponseDTO } from 'src/shared/dtos/response.dto';
 import { AGENT_ID } from 'src/shared/enums/agentid.enums';
 import { RESPONSE_CODE } from 'src/shared/enums/response-code.enum';
-import { ChatWithHistoryRequestPayloadDTO } from './dtos/chat-request-payload.dto';
+import { ChatWithHistoryRequestPayloadDTO } from '../dtos/chat-request-payload.dto';
 import { MessageListInput } from '@mastra/core/agent/message-list';
 import { Agent, AgentEditorConfig, ToolsInput } from '@mastra/core/agent';
 

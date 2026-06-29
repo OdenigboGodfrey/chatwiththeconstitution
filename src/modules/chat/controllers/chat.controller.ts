@@ -1,9 +1,9 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
-import { ChatService } from './chat.service';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import { ChatService } from '../services/chat.service';
 import {
   ChatRequestPayloadDTO,
   ChatWithHistoryRequestPayloadDTO,
-} from './dtos/chat-request-payload.dto';
+} from '../dtos/chat-request-payload.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('chat')
@@ -23,5 +23,10 @@ export class ChatController {
   async chatWithHistory(@Body() payload: ChatWithHistoryRequestPayloadDTO) {
     const response = await this.chatService.handleChatWithHistory(payload);
     return response.getResponse();
+  }
+
+  @Get()
+  hello() {
+    return 'Hello world!';
   }
 }

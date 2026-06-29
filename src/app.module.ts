@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { ChatModule } from './modules/chat/chat.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChannelsModule } from './modules/channels/channels.module';
 
 @Module({
   imports: [
@@ -21,7 +20,7 @@ import { ChannelsModule } from './modules/channels/channels.module';
       logging: true,
     }),
     ChatModule,
-    ChannelsModule,
+    // ChannelsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
