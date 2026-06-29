@@ -8,6 +8,7 @@ import {
 
 @Entity({
   name: 'chat_history',
+  schema: process.env.DATABASE_SCHEMA,
 })
 export class ChatHistoryEntity {
   @PrimaryGeneratedColumn('uuid')
