@@ -18,6 +18,7 @@ export class TelegramService {
     });
 
     this.bot.on('text', (ctx) => {
+      console.log('User message:', ctx.message.text);
       ctx.reply(`You said: ${ctx.message.text}`);
     });
   }
