@@ -10,6 +10,7 @@ export class TelegramService {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN || '');
 
     this.bot.start((ctx) => {
+      console.log('Chat ID:', ctx.chat.id);
       ctx.reply(this.defaultMessage);
     });
 
@@ -18,7 +19,7 @@ export class TelegramService {
     });
 
     this.bot.on('text', (ctx) => {
-      console.log('User message:', ctx.message.text);
+      console.log('User', ctx.chat.id, ' sent message:', ctx.message.text);
       ctx.reply(`You said: ${ctx.message.text}`);
     });
   }
