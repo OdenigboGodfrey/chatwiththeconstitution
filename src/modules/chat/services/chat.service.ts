@@ -7,11 +7,8 @@ import { RESPONSE_CODE } from 'src/shared/enums/response-code.enum';
 import { ChatWithHistoryRequestPayloadDTO } from '../dtos/chat-request-payload.dto';
 import { MessageListInput } from '@mastra/core/agent/message-list';
 import { Agent, AgentEditorConfig, ToolsInput } from '@mastra/core/agent';
-
-interface MastraMessageFormat {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-}
+import { MastraMessageFormat } from '../interfaces/mastra-message-format.interface';
+import { removeMarkdown } from '../utils/chat-helper.util';
 
 @Injectable()
 export class ChatService {
@@ -137,7 +134,7 @@ export class ChatService {
       }
 
       if (agentResponse && agentResponse.text) {
-        response.data = this.removeMarkdown(agentResponse.text);
+        response.data = removeMarkdown(agentResponse.text);
         response.code = RESPONSE_CODE._200;
         response.message = 'Chat processed successfully';
       } else {
@@ -154,15 +151,5 @@ export class ChatService {
     }
 
     return response;
-  }
-
-  removeMarkdown(text: string): string {
-    // Removes hashtags at the start of lines (headers)
-    let cleanedText = text.replace(/^#+\s*/gm, '');
-
-    // Removes asterisks used for bold/italics
-    cleanedText = cleanedText.replace(/\*+/g, '');
-
-    return cleanedText;
   }
 }
