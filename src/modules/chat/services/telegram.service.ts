@@ -39,7 +39,12 @@ export class TelegramService {
             throw new Error(record.message);
           }
 
-          if (message == 'hello' || message == 'hi' || message == 'hey') {
+          const messageToLower = message.toLowerCase();
+          if (
+            messageToLower == 'hello' ||
+            messageToLower == 'hi' ||
+            messageToLower == 'hey'
+          ) {
             await this.bot.telegram.sendMessage(
               chatId,
               defaultAssistantMessage,
