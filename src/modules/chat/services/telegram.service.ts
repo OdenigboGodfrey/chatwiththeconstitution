@@ -39,6 +39,14 @@ export class TelegramService {
             throw new Error(record.message);
           }
 
+          if (message == 'hello' || message == 'hi' || message == 'hey') {
+            await this.bot.telegram.sendMessage(
+              chatId,
+              defaultAssistantMessage,
+            );
+            return;
+          }
+
           await this.bot.telegram.sendMessage(chatId, botWorkingMessage);
           const existingMessage =
             await this.chatHistoryRepo.getChatHistoryByChatAndSourceId(
