@@ -30,7 +30,7 @@ export class WhatsappService {
         console.log(
           `Conversation window for ${toUserId} is about to expire. Skipping message.`,
         );
-        return;
+        return null;
       }
       const url = `https://graph.facebook.com/v25.0/${this.PHONE_NUMBER_ID}/messages`;
 
@@ -53,6 +53,7 @@ export class WhatsappService {
       return response.data;
     } catch (error) {
       console.error('Send message error:', error);
+      return null;
     }
   }
 
@@ -112,6 +113,8 @@ export class WhatsappService {
       const from = message.from; // sender phone number
       let text = (message.text?.body as string) || '';
       text = text.trim().toLowerCase();
+      // for whatsapp messages maximum length should be 4000 chars. we need to add that to the prompt.
+      text = text + ' IMPORTANT: Please respond within 4000 characters.';
 
       console.log('New WhatsApp message');
       console.log('From:', from);
@@ -166,7 +169,16 @@ export class WhatsappService {
       );
       if (agentResponse.status) {
         const assistantMessage = agentResponse.data;
-        await this.sendTextMessage(from, assistantMessage, fromUserId);
+        const sendMessageResponse = await this.sendTextMessage(
+          from,
+          assistantMessage,
+          fromUserId,
+        );
+        if (!sendMessageResponse) {
+          console.error('Failed to send message', fromUserId);
+          throw new Error('[WABA_API_ERROR]: Failed to send message');
+        }
+
         await this.chatHistoryRepo.saveAssistantMessageAndUpdateUserMessage(
           agentResponse.data,
           from,
