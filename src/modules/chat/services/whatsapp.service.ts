@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import axios from 'axios';
@@ -53,7 +50,6 @@ export class WhatsappService {
         },
       });
 
-      console.log('Message sent:', response.data);
       return response.data;
     } catch (error) {
       console.error('Send message error:', error);
@@ -77,9 +73,7 @@ export class WhatsappService {
       const changes = entry?.changes?.[0];
       const value = changes?.value;
       const message = value?.messages?.[0];
-      console.log('new message received', message);
       if (!message) {
-        console.log('No message found in webhook payload');
         return;
       }
       if (message.type !== 'text') {
@@ -96,7 +90,7 @@ export class WhatsappService {
           messageId,
         );
       if (existingMessage.status) {
-        console.log('Message with that id already received');
+        // console.log('Message with that id already received');
         return;
       }
       // get last 24hrs message info
@@ -147,12 +141,10 @@ export class WhatsappService {
         return;
       }
 
-      console.log('WhatApp Message saved');
       if (text == 'hello' || text == 'hi' || text == 'hey') {
         await this.sendTextMessage(from, defaultAssistantMessage, fromUserId);
         return;
       }
-      console.log('Processing message...');
       await this.sendTextMessage(from, botWorkingMessage, fromUserId);
 
       const existingMessages =
@@ -160,7 +152,6 @@ export class WhatsappService {
           from,
           'whatsapp',
         );
-      console.log('Existing messages:', existingMessages.data.length);
 
       const agentResponse = await handleAgentResponse(
         this.mastraService,
@@ -173,7 +164,6 @@ export class WhatsappService {
               },
             ],
       );
-      console.log('Agent response:', agentResponse.data);
       if (agentResponse.status) {
         const assistantMessage = agentResponse.data;
         await this.sendTextMessage(from, assistantMessage, fromUserId);

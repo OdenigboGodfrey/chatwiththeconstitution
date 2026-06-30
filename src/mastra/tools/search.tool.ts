@@ -48,7 +48,7 @@ export const duckduckgoSearchTool = createTool({
           // console.log('search tool response', results);
           return { results };
         }
-        console.log('No results found. Retrying...');
+        // console.log('No results found. Retrying...');
       }
     } catch (error) {
       console.error('search Tool Error:', error);

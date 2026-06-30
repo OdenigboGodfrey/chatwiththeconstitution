@@ -20,7 +20,6 @@ export class TelegramService {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN || '');
 
     this.bot.start((ctx) => {
-      console.log('Chat ID:', ctx.chat.id);
       ctx.reply(this.defaultMessage);
     });
 
@@ -40,7 +39,6 @@ export class TelegramService {
             throw new Error(record.message);
           }
 
-          console.log('Message saved');
           await this.bot.telegram.sendMessage(chatId, botWorkingMessage);
           const existingMessage =
             await this.chatHistoryRepo.getChatHistoryByChatAndSourceId(
@@ -65,7 +63,6 @@ export class TelegramService {
                 chatId,
                 response.data,
               );
-              console.log('Response sent', ctxResponse);
               // save assistant response
               await this.chatHistoryRepo.saveAssistantMessageAndUpdateUserMessage(
                 response.data,
@@ -103,7 +100,6 @@ export class TelegramService {
       'telegram',
       responsePending,
     );
-    console.log('Saved message', response);
     return response;
   }
 }

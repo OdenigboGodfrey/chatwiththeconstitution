@@ -28,7 +28,7 @@ export async function ddgsSearch(query: string, maxResults = 5) {
     }
 
     const html = await response.text();
-    console.log('html', html);
+    // console.log('html', html);
     const $ = cheerio.load(html);
     const initialResults: { title: string; url: string; snippet: string }[] =
       [];
@@ -49,13 +49,11 @@ export async function ddgsSearch(query: string, maxResults = 5) {
       }
 
       const snippet = $(el).find('.result__snippet').text().trim();
-      console.log('cheerio result item', { title, url: href, snippet });
       if (href && href.startsWith('http')) {
         initialResults.push({ title, url: href, snippet });
       }
     });
 
-    console.log('initialResults', initialResults.length);
     // 2. Fetch the extra data from each URL concurrently
     const results = await Promise.all(
       initialResults.map(async (item) => {
@@ -86,7 +84,6 @@ export async function ddgsSearch(query: string, maxResults = 5) {
           snippet: item.snippet,
           content: content,
         });
-        console.log('detailedResponse', detailedResponse);
 
         return detailedResponse;
       }),
@@ -95,7 +92,7 @@ export async function ddgsSearch(query: string, maxResults = 5) {
     // 3. Respectful delay for the next sequential DDG call
     await new Promise((r) => setTimeout(r, 2000 + Math.random() * 3000));
 
-    console.log('ddgs util result item', results);
+    // console.log('ddgs util result item', results);
     return results;
   } catch (error) {
     console.error('Error in ddgsSearch:', error);

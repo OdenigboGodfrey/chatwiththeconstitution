@@ -15,6 +15,9 @@ CREATE TABLE whatsapp_messages (
 CREATE INDEX idx_whatsapp_messages_from_phone
     ON whatsapp_messages (from_phone);
 
+CREATE INDEX idx_whatsapp_messages_from_user_id
+    ON whatsapp_messages (from_user_id);
+
 CREATE INDEX idx_whatsapp_messages_message_id
     ON whatsapp_messages (message_id);
 
