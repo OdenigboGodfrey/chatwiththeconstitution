@@ -38,7 +38,7 @@ export class ChatService {
           agentResponse = await agent.generate(text, {
             modelSettings: {
               maxOutputTokens: process.env.LLM_MAX_OUTPUT_TOKEN
-                ? (process.env.LLM_MAX_OUTPUT_TOKEN as unknown as number)
+                ? parseInt(process.env.LLM_MAX_OUTPUT_TOKEN)
                 : 400,
               headers: {
                 Authorization: `Bearer ${process.env.LLM_API_KEY}`,
@@ -123,7 +123,7 @@ export class ChatService {
             {
               modelSettings: {
                 maxOutputTokens: process.env.LLM_MAX_OUTPUT_TOKEN
-                  ? (process.env.LLM_MAX_OUTPUT_TOKEN as unknown as number)
+                  ? parseInt(process.env.LLM_MAX_OUTPUT_TOKEN)
                   : 400,
               },
             },

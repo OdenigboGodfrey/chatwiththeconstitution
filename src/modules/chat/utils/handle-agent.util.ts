@@ -40,7 +40,7 @@ export async function handleAgentResponse(
           {
             modelSettings: {
               maxOutputTokens: process.env.LLM_MAX_OUTPUT_TOKEN
-                ? (process.env.LLM_MAX_OUTPUT_TOKEN as unknown as number)
+                ? parseInt(process.env.LLM_MAX_OUTPUT_TOKEN)
                 : 400,
             },
           },
