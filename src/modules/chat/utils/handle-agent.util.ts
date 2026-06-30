@@ -39,7 +39,9 @@ export async function handleAgentResponse(
           completeMessageList as MessageListInput,
           {
             modelSettings: {
-              maxOutputTokens: 1200,
+              maxOutputTokens: process.env.LLM_MAX_OUTPUT_TOKEN
+                ? (process.env.LLM_MAX_OUTPUT_TOKEN as unknown as number)
+                : 400,
             },
           },
         );

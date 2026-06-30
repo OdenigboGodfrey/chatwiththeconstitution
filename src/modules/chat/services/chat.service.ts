@@ -37,7 +37,9 @@ export class ChatService {
           // retry till agent generates a response before giving up
           agentResponse = await agent.generate(text, {
             modelSettings: {
-              maxOutputTokens: 1200,
+              maxOutputTokens: process.env.LLM_MAX_OUTPUT_TOKEN
+                ? (process.env.LLM_MAX_OUTPUT_TOKEN as unknown as number)
+                : 400,
               headers: {
                 Authorization: `Bearer ${process.env.LLM_API_KEY}`,
               },
@@ -120,7 +122,9 @@ export class ChatService {
             completeMessageList as MessageListInput,
             {
               modelSettings: {
-                maxOutputTokens: 1200,
+                maxOutputTokens: process.env.LLM_MAX_OUTPUT_TOKEN
+                  ? (process.env.LLM_MAX_OUTPUT_TOKEN as unknown as number)
+                  : 400,
               },
             },
           );
