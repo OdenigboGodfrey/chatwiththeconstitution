@@ -10,7 +10,7 @@ export class ChatHistoryRepository {
 
   async saveMessage(
     message: string,
-    chatId: number,
+    chatId: string,
     role: 'user' | 'assistant',
     source: string,
     responsePending: boolean,
@@ -27,7 +27,7 @@ export class ChatHistoryRepository {
         chatHistory.content = message;
         chatHistory.role = role;
         chatHistory.source = source;
-        chatHistory.sourceId = chatId;
+        chatHistory.sourceId = chatId.toString();
         chatHistory.responsePending = responsePending;
         await manager.save(chatHistory);
 
@@ -57,38 +57,46 @@ export class ChatHistoryRepository {
 
   async saveAssistantMessageAndUpdateUserMessage(
     message: string,
-    chatId: number,
+    chatId: string,
     role: 'user' | 'assistant',
     source: string,
     messageId: string,
   ): Promise<ResponseDTO<ChatHistoryEntity>> {
     const response = new ResponseDTO<ChatHistoryEntity>();
+    const MAX_RETRY_COUNT = 5;
     try {
       const queryRunner = this.dataSource.createQueryRunner();
       try {
         await queryRunner.connect();
         await queryRunner.startTransaction();
         const manager = queryRunner.manager;
+        for (let i = 0; i < MAX_RETRY_COUNT; i++) {
+          try {
+            const chatHistory = new ChatHistoryEntity();
+            chatHistory.content = message;
+            chatHistory.role = role;
+            chatHistory.source = source;
+            chatHistory.sourceId = chatId.toString();
+            chatHistory.responsePending = false;
+            await manager.save(chatHistory);
 
-        const chatHistory = new ChatHistoryEntity();
-        chatHistory.content = message;
-        chatHistory.role = role;
-        chatHistory.source = source;
-        chatHistory.sourceId = chatId;
-        chatHistory.responsePending = false;
-        await manager.save(chatHistory);
+            // update user message
+            await manager.update(
+              ChatHistoryEntity,
+              { id: messageId },
+              { responsePending: false },
+            );
 
-        // update user message
-        await manager.update(
-          ChatHistoryEntity,
-          { id: messageId },
-          { responsePending: false },
-        );
-
-        await queryRunner.commitTransaction();
-        response.data = chatHistory;
-        response.code = RESPONSE_CODE._200;
-        response.message = 'Message saved successfully';
+            await queryRunner.commitTransaction();
+            response.data = chatHistory;
+            response.code = RESPONSE_CODE._200;
+            response.message = 'Message saved successfully';
+            break;
+          } catch (error) {
+            console.error(error);
+            continue;
+          }
+        }
       } catch (error) {
         console.error(error);
         response.code = RESPONSE_CODE._500;
@@ -110,7 +118,7 @@ export class ChatHistoryRepository {
   }
 
   async getChatHistoryByChatAndSourceId(
-    chatId: number,
+    chatId: string,
     source: string,
   ): Promise<ResponseDTO<ChatHistoryEntity[]>> {
     const response = new ResponseDTO<ChatHistoryEntity[]>();

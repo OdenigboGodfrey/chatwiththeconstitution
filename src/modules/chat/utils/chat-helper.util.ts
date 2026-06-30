@@ -2,6 +2,10 @@ import { ChatItemPayloadDTO } from '../dtos/chat-request-payload.dto';
 import { ChatHistoryEntity } from '../entities/chat-history.entity';
 import { MastraMessageFormat } from '../interfaces/mastra-message-format.interface';
 
+export const defaultAssistantMessage = `Hello! Ask me anything about the Constitution or the Electoral Act, and I'll help you find the relevant provisions.`;
+
+export const botWorkingMessage = `Please wait, I am processing your request...`;
+
 export function sanitizePayload(
   payload: ChatHistoryEntity[] | ChatItemPayloadDTO[] = [],
 ): MastraMessageFormat[] {

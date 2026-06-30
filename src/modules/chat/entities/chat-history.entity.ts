@@ -15,7 +15,7 @@ export class ChatHistoryEntity {
   id!: string;
 
   @Column()
-  sourceId!: number;
+  sourceId!: string;
 
   @Column()
   role!: string;

@@ -2,7 +2,7 @@ CREATE TABLE chat_history (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     content TEXT NOT NULL,
     role VARCHAR(50) NOT NULL,
-    "sourceId" BIGINT NOT NULL,
+    "sourceId" VARCHAR(100) NOT NULL,
 	source VARCHAR(100),
     "responsePending" BOOLEAN NOT NULL DEFAULT FALSE,
     "retryCount" INT NOT NULL DEFAULT 0,

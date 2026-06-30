@@ -8,15 +8,25 @@ import { TelegramService } from './services/telegram.service';
 import { ChatHistoryEntity } from './entities/chat-history.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatHistoryRepository } from './repositories/chat-history.repo';
+import { WhatsappService } from './services/whatsapp.service';
+import { WhatsappController } from './controllers/whatsapp.controller';
+import { WhatsappMessageEntity } from './entities/whatsapp-message.entity';
+import { WhatsappMessageRepository } from './repositories/whatsapp-message.repo';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ChatHistoryEntity]),
+    TypeOrmModule.forFeature([ChatHistoryEntity, WhatsappMessageEntity]),
     MastraModule.register({
       mastra: mastra,
     }),
   ],
-  controllers: [ChatController, TelegramController],
-  providers: [ChatHistoryRepository, ChatService, TelegramService],
+  controllers: [ChatController, TelegramController, WhatsappController],
+  providers: [
+    ChatHistoryRepository,
+    WhatsappMessageRepository,
+    ChatService,
+    TelegramService,
+    WhatsappService,
+  ],
 })
 export class ChatModule {}
