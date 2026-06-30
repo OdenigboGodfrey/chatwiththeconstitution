@@ -113,7 +113,6 @@ export class WhatsappService {
       const from = message.from; // sender phone number
       let text = (message.text?.body as string) || '';
       text = text.trim().toLowerCase();
-      // for whatsapp messages maximum length should be 4000 chars. we need to add that to the prompt.
 
       console.log('New WhatsApp message');
       console.log('From:', from);
