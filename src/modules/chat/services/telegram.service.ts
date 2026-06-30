@@ -28,8 +28,8 @@ export class TelegramService {
     });
 
     this.bot.on('text', (ctx) => {
-      const chatId = ctx.chat.id;
-      const message = ctx.message.text;
+      const chatId = ctx?.chat.id;
+      const message = ctx?.message.text;
       console.log('User', chatId, ' sent message:', message);
 
       this.saveMessage(message, chatId, 'user', true)
@@ -59,10 +59,7 @@ export class TelegramService {
           if (response.status) {
             try {
               // const ctxResponse = await ctx.reply(response.data);
-              const ctxResponse = this.bot.telegram.sendMessage(
-                chatId,
-                response.data,
-              );
+              await this.bot.telegram.sendMessage(chatId, response.data);
               // save assistant response
               await this.chatHistoryRepo.saveAssistantMessageAndUpdateUserMessage(
                 response.data,

@@ -273,6 +273,47 @@
                 background-color: #555;
             }
         }
+        .chat-channels {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-top: 1px solid;
+            flex-shrink: 0;
+        }
+
+        .channels-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .chat-channels a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: transform .2s ease, opacity .2s ease;
+        }
+
+        .chat-channels a:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        .telegram-btn {
+            background: #229ED9;
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+        }
     </style>
 </head>
 
@@ -285,6 +326,24 @@
         <input type="text" id="user-input" placeholder="Type your message...">
         <button id="send-btn">Send</button>
     </footer>
+    <div class="chat-channels">
+        <span class="channels-label">Also chat with the Constitution on:</span>
+    
+        <a href="https://t.me/goveratech_bot"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="telegram-btn">
+            📩 Telegram
+        </a>
+    
+        <a href="https://wa.me/2349162984221?text=Hello"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="whatsapp-btn">
+            💬 WhatsApp
+        </a>
+    </div>
+    
     <div class="toast-container" id="toastContainer"></div>
 </body>
 

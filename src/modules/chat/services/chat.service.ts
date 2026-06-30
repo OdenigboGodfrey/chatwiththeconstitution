@@ -5,10 +5,9 @@ import { ResponseDTO } from 'src/shared/dtos/response.dto';
 import { AGENT_ID } from 'src/shared/enums/agentid.enums';
 import { RESPONSE_CODE } from 'src/shared/enums/response-code.enum';
 import { ChatWithHistoryRequestPayloadDTO } from '../dtos/chat-request-payload.dto';
-import { MessageListInput } from '@mastra/core/agent/message-list';
 import { Agent, AgentEditorConfig, ToolsInput } from '@mastra/core/agent';
 import { MastraMessageFormat } from '../interfaces/mastra-message-format.interface';
-import { removeMarkdown } from '../utils/chat-helper.util';
+import { handleAgentResponse } from '../utils/handle-agent.util';
 
 @Injectable()
 export class ChatService {
@@ -77,20 +76,7 @@ export class ChatService {
   ): Promise<ResponseDTO<string>> {
     const response = new ResponseDTO<string>();
     try {
-      let agent: Agent<
-        any,
-        ToolsInput,
-        undefined,
-        unknown,
-        AgentEditorConfig | undefined
-      >;
-      if (process.env.USE_OLLAMA == 'true') {
-        agent = this.mastraService.getAgent(AGENT_ID.OLLAMA_RAG_AGENT);
-      } else {
-        agent = this.mastraService.getAgent(AGENT_ID.OPENAI_RAG_AGENT);
-      }
-      let agentResponse: FullOutput<undefined> | null = null;
-      const MAX_RETRIES = 3;
+      let agentResponse: ResponseDTO<string> | null = null;
 
       // 2. convert the payload history array elements into Mastra shapes
       const completeMessageList: MastraMessageFormat[] = (
@@ -115,30 +101,14 @@ export class ChatService {
         role: 'user',
         content: payload.text,
       });
-      //   console.log('completeMessageList', completeMessageList);
-      for (let i = 0; i < MAX_RETRIES; i++) {
-        try {
-          agentResponse = await agent.generate(
-            completeMessageList as MessageListInput,
-            {
-              modelSettings: {
-                maxOutputTokens: process.env.LLM_MAX_OUTPUT_TOKEN
-                  ? parseInt(process.env.LLM_MAX_OUTPUT_TOKEN)
-                  : 400,
-              },
-            },
-          );
 
-          if (agentResponse && agentResponse.text) {
-            break;
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
+      agentResponse = await handleAgentResponse(
+        this.mastraService,
+        completeMessageList,
+      );
 
-      if (agentResponse && agentResponse.text) {
-        response.data = removeMarkdown(agentResponse.text);
+      if (agentResponse?.status) {
+        response.data = agentResponse.data;
         response.code = RESPONSE_CODE._200;
         response.message = 'Chat processed successfully';
       } else {
