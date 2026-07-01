@@ -30,7 +30,8 @@
             font-weight: bold;
             border-bottom: 1px solid;
             transition: background-color 0.3s, border-color 0.3s;
-            flex-shrink: 0; /* Prevents the header from squeezing out of view */
+            flex-shrink: 0;
+            /* Prevents the header from squeezing out of view */
         }
 
         #chat-container {
@@ -69,6 +70,7 @@
         .user-message {
             align-self: flex-end;
         }
+
         /* Aligns user timestamp to the left */
         .user-message .message-time {
             align-self: flex-start;
@@ -77,6 +79,7 @@
         .bot-message {
             align-self: flex-start;
         }
+
         /* Aligns bot timestamp to the right */
         .bot-message .message-time {
             align-self: flex-end;
@@ -85,9 +88,10 @@
         /* Styling for system messages if needed */
         .system-message {
             align-self: center;
-            background-color: rgba(0,0,0,0.05);
+            background-color: rgba(0, 0, 0, 0.05);
             font-size: 0.9rem;
         }
+
         .system-message .message-time {
             align-self: center;
         }
@@ -167,6 +171,7 @@
                 opacity: 0;
                 transform: translateX(100%);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -251,7 +256,7 @@
 
             .system-message {
                 color: #bbb;
-                background-color: rgba(255,255,255,0.05);
+                background-color: rgba(255, 255, 255, 0.05);
             }
 
             footer {
@@ -273,6 +278,7 @@
                 background-color: #555;
             }
         }
+
         .chat-channels {
             display: flex;
             flex-wrap: wrap;
@@ -328,22 +334,18 @@
     </footer>
     <div class="chat-channels">
         <span class="channels-label">Also chat with the Constitution on:</span>
-    
-        <a href="https://t.me/goveratech_bot"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="telegram-btn">
-            📩 Telegram
-        </a>
-    
-        <a href="https://wa.me/2349162984221?text=Hello"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="whatsapp-btn">
-            💬 WhatsApp
-        </a>
+        <div>
+            <a href="https://t.me/goveratech_bot" target="_blank" rel="noopener noreferrer" class="telegram-btn">
+                📩 Telegram
+            </a>
+
+            <a href="https://wa.me/2349162984221?text=Hello" target="_blank" rel="noopener noreferrer"
+                class="whatsapp-btn">
+                💬 WhatsApp
+            </a>
+        </div>
     </div>
-    
+
     <div class="toast-container" id="toastContainer"></div>
 </body>
 
@@ -409,9 +411,9 @@
                     <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1 a8.45 8.45 0 0 0-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l-.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3-1.57-3-3.5s1.07-3.5 3-3.5 3 1.57 3 3.5-1.07 3.5-3 3.5z"/>
                 </svg>
             `;
-            iconSpan.style.color = '#000000'; 
+            iconSpan.style.color = '#000000';
         } else {
-            iconSpan.textContent = '📜'; 
+            iconSpan.textContent = '📜';
         }
 
         // Create message text span
@@ -425,7 +427,7 @@
 
         // Fetch current time formatted (e.g., 14:32)
         const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
+
         // Create timestamp container
         const timeDiv = document.createElement('div');
         timeDiv.classList.add('message-time');
@@ -434,7 +436,7 @@
 
         chatContainer.appendChild(msgDiv);
         chatContainer.scrollTop = chatContainer.scrollHeight;
-        
+
         if (type === 'user' || type === 'bot') {
             inMemoryChatHistory.push({ content: message, role: type });
         }
@@ -451,7 +453,7 @@
             return;
         }
         showToast(`Processing your request...`, "success");
-        
+
         const body = {
             "text": message,
             "history": inMemoryChatHistory
