@@ -51,7 +51,6 @@ export class WhatsappMessageRepository {
           const expiresAt = new Date(
             messageDate.getTime() + 24 * 60 * 60 * 1000,
           );
-          expiresAt.setHours(expiresAt.getHours() + 24);
           record.message24hTimestamp = expiresAt;
         }
         await manager.save(record);
