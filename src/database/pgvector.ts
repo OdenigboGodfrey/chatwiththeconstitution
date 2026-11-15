@@ -9,4 +9,10 @@ export const pgVector = new PgVector({
   database: process.env.DATABASE!,
   id: VECTOR_ID.ID,
   schemaName: process.env.DATABASE_SCHEMA!,
+  ssl:
+    process.env.DATABASE_REQUIRE_SSL === 'true'
+      ? {
+          rejectUnauthorized: false,
+        }
+      : undefined,
 });
